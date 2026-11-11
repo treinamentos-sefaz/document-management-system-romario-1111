@@ -148,4 +148,4 @@ O repositorio pode manter, junto aos metadados publicos, um campo interno como `
 
 O Passo 2 do exercicio ainda nao foi liberado. Portanto, este plano cobre somente o Passo 1 e nao antecipa etapas de implementacao.
 
-1. Consolidar os requisitos funcionais e nao funcionais, o modelo de dados, os contratos de API e as decisoes arquiteturais neste documento, para revisao antes de qualquer implementacao.
+1. Consolidar os requisitos funcionais e nao funcionais, o modelo de dados, os contratos de API e as decisoes arquiteturais neste documento, para revisao antes de qualquer implementacao..
