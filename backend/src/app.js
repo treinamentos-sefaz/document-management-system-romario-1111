@@ -11,6 +11,8 @@
 // usando multer com diskStorage. Não utilize provedores externos.
 
 const express = require('express');
+const documentRoutes = require('./routes/documentRoutes');
+const errorController = require('./controllers/errorController');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +24,9 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+app.use(documentRoutes);
+app.use(errorController);
 
 if (require.main === module) {
   app.listen(PORT, () => {
