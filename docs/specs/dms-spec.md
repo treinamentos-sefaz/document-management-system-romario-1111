@@ -146,11 +146,6 @@ O repositorio pode manter, junto aos metadados publicos, um campo interno como `
 
 ## 8. Plano de execucao
 
-As etapas abaixo descrevem marcos futuros do produto; esta especificacao nao executa nem lista alteracoes em arquivos de backend ou frontend.
+O Passo 2 do exercicio ainda nao foi liberado. Portanto, este plano cobre somente o Passo 1 e nao antecipa etapas de implementacao.
 
-1. Revisar e aprovar requisitos, contratos HTTP, limite de upload e premissas de identidade confiavel.
-2. Preparar a configuracao da aplicacao e os limites de armazenamento local, preservando as camadas definidas.
-3. Implementar e validar o fluxo de upload, incluindo validacoes, gravacao local e registro em memoria.
-4. Implementar e validar listagem e download com isolamento por usuario.
-5. Integrar a interface React aos contratos da API para envio, consulta e download.
-6. Verificar os criterios de aceite com testes de sucesso, validacao, ownership, limites de tamanho e falhas de filesystem.
+1. Consolidar os requisitos funcionais e nao funcionais, o modelo de dados, os contratos de API e as decisoes arquiteturais neste documento, para revisao antes de qualquer implementacao.
