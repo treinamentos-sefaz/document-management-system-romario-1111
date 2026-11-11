@@ -1,9 +1,9 @@
 const express = require('express');
 const documentRoutes = require('./routes/documentRoutes');
 const errorController = require('./controllers/errorController');
+const config = require('./config');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -16,8 +16,8 @@ app.use(documentRoutes);
 app.use(errorController);
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`DMS backend ouvindo na porta ${PORT}`);
+  app.listen(config.port, config.host, () => {
+    console.log(`DMS backend ouvindo em ${config.host}:${config.port}`);
   });
 }
 

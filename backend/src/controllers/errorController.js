@@ -17,8 +17,9 @@ function errorController(error, req, res, next) {
   }
 
   const statusCode = Number.isInteger(error.statusCode) ? error.statusCode : 500;
-  const code = error.code || 'INTERNAL_SERVER_ERROR';
-  const message = statusCode === 500 ? 'Erro interno do servidor.' : error.message;
+  const isExpectedError = error.safeToExpose === true;
+  const code = isExpectedError ? error.code : 'INTERNAL_SERVER_ERROR';
+  const message = isExpectedError ? error.message : 'Erro interno do servidor.';
 
   return res.status(statusCode).json({ error: { code, message } });
 }

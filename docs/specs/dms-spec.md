@@ -43,19 +43,26 @@ Permitir que usuarios enviem, consultem e baixem seus documentos, mantendo os ar
 | --- | --- |
 | RNF-01 | Os arquivos devem ser gravados localmente em `backend/storage`, usando `multer` com `diskStorage`; nao usar servicos ou provedores externos. |
 | RNF-02 | Os metadados devem permanecer em memoria nesta fase. Reiniciar o processo pode tornar os metadados indisponiveis mesmo que os arquivos continuem no disco. |
-| RNF-03 | A porta e o limite maximo de upload devem ser configuraveis por variaveis de ambiente, com valores padrao documentados. |
+| RNF-03 | Porta, limite de arquivo, concorrencia de upload e quotas de armazenamento devem ser configuraveis por variaveis de ambiente, com valores padrao documentados. |
 | RNF-04 | O nome recebido do cliente nao pode ser usado como caminho ou nome fisico do arquivo. O nome interno deve ser gerado pela aplicacao. |
 | RNF-05 | Respostas de erro nao devem expor caminhos locais, stack traces ou detalhes internos. |
 | RNF-06 | A API deve usar JSON para respostas de sucesso de metadados e para erros, exceto o corpo binario do download. |
-| RNF-07 | A identidade `X-User-Id` e uma premissa de confianca, nao um mecanismo de autenticacao. A API nao deve ser exposta a clientes nao confiaveis sem uma camada de autenticacao que defina essa identidade. |
+| RNF-07 | `X-User-Id` nao e autenticacao: em producao, a identidade deve vir de contexto autenticado, de um usuario fixo configurado no servidor ou de um proxy confiavel explicitamente habilitado. |
 | RNF-08 | A aplicacao pressupoe um unico processo local. O filesystem e os metadados em memoria nao oferecem compartilhamento entre replicas. |
+| RNF-09 | O backend deve escutar em loopback por padrao; exposicao externa requer configuracao explicita e uma fronteira de identidade confiavel. |
+| RNF-10 | O diretorio local deve usar permissao `0700` e os arquivos `0600`; downloads e metadados devem usar `Cache-Control: private, no-store`. |
 
 ### Configuracao
 
 | Variavel | Padrao | Uso |
 | --- | --- | --- |
+| `HOST` | `127.0.0.1` | Interface de rede onde o backend escuta. Configure outra interface somente quando houver uma fronteira de rede/autenticacao adequada. |
 | `PORT` | `3000` | Porta HTTP do backend. |
 | `UPLOAD_MAX_FILE_SIZE_BYTES` | `10485760` (10 MiB) | Tamanho maximo permitido para um arquivo. |
+| `DMS_MAX_CONCURRENT_UPLOADS` | `5` | Numero maximo de uploads simultaneos por processo. |
+| `DMS_MAX_DOCUMENT_COUNT` | `1000` | Quantidade maxima de documentos mantidos nos metadados em memoria. |
+| `DMS_MAX_STORAGE_BYTES` | `1073741824` (1 GiB) | Tamanho total maximo dos arquivos registrados. |
+| `DMS_TRUSTED_IDENTITY_HEADER` | `false` em producao | Em desenvolvimento, `X-User-Id` e aceito por padrao. Em producao, habilite somente quando um proxy confiavel remover o valor externo e inserir o seu proprio. |
 
 O diretorio de armazenamento desta fase e fixo em `backend/storage`; nao deve ser substituido por um caminho de provedor externo.
 
@@ -102,7 +109,7 @@ O repositorio pode manter, junto aos metadados publicos, um campo interno como `
 }
 ```
 
-- **Erros:** HTTP 400 para identidade, campo ou arquivo ausente/invalido; HTTP 413 para arquivo maior que o limite; HTTP 500 para falha inesperada de armazenamento ou persistencia de metadados.
+- **Erros:** HTTP 400 para identidade, campo ou arquivo ausente/invalido; HTTP 413 para arquivo maior que o limite; HTTP 503 para limite de concorrencia; HTTP 507 para quota de armazenamento; HTTP 500 para falha inesperada.
 
 ### `GET /documents`
 

@@ -15,4 +15,11 @@ function findByOwner(owner) {
     .map((document) => ({ ...document }));
 }
 
-module.exports = { save, findById, findByOwner };
+function getUsage() {
+  return [...documents.values()].reduce((usage, document) => ({
+    count: usage.count + 1,
+    bytes: usage.bytes + document.size,
+  }), { count: 0, bytes: 0 });
+}
+
+module.exports = { save, findById, findByOwner, getUsage };

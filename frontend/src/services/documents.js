@@ -51,6 +51,8 @@ export async function downloadDocument(document, userId) {
   const anchor = window.document.createElement('a');
   anchor.href = objectUrl;
   anchor.download = document.originalName;
+  window.document.body.append(anchor);
   anchor.click();
-  URL.revokeObjectURL(objectUrl);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }

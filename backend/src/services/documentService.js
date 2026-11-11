@@ -1,17 +1,24 @@
 const { randomUUID } = require('node:crypto');
 const documentRepository = require('../repositories/documentRepository');
 const fileStorageRepository = require('../repositories/fileStorageRepository');
+const config = require('../config');
 
 function createError(statusCode, code, message) {
   const error = new Error(message);
   error.statusCode = statusCode;
   error.code = code;
+  error.safeToExpose = true;
   return error;
 }
 
 function toPublicDocument(document) {
-  const { storageName, ...publicDocument } = document;
-  return publicDocument;
+  return {
+    id: document.id,
+    originalName: document.originalName,
+    size: document.size,
+    uploadedAt: document.uploadedAt,
+    owner: document.owner,
+  };
 }
 
 async function createDocument(file, owner) {
@@ -32,9 +39,18 @@ async function createDocument(file, owner) {
   };
 
   try {
+    await fileStorageRepository.restrictFilePermissions(file.filename);
+
+    const storageUsage = await fileStorageRepository.getStorageUsage();
+    const documentUsage = documentRepository.getUsage();
+    if (documentUsage.count >= config.maxDocumentCount
+      || storageUsage.bytes > config.maxStorageBytes) {
+      throw createError(507, 'STORAGE_QUOTA_EXCEEDED', 'O armazenamento local atingiu o limite configurado.');
+    }
+
     documentRepository.save(document);
   } catch (error) {
-    await fileStorageRepository.remove(file.filename);
+    await fileStorageRepository.remove(file.filename).catch(() => {});
     throw error;
   }
 
