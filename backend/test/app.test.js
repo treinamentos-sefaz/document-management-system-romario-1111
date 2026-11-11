@@ -80,6 +80,16 @@ test('upload exige arquivo e aplica limite de tamanho', async (context) => {
   });
   assert.equal(missingFile.status, 400);
 
+  const emptyForm = new FormData();
+  emptyForm.set('file', new Blob([]), 'empty.txt');
+  const emptyUpload = await fetch(`${baseUrl}/upload`, {
+    method: 'POST',
+    headers: { 'X-User-Id': 'user-empty-file' },
+    body: emptyForm,
+  });
+  assert.equal(emptyUpload.status, 400);
+  assert.equal((await emptyUpload.json()).error.code, 'INVALID_FILE');
+
   const oversizedForm = new FormData();
   oversizedForm.set('file', new Blob([new Uint8Array(10 * 1024 * 1024 + 1)]), 'large.bin');
   const oversizedUpload = await fetch(`${baseUrl}/upload`, {
